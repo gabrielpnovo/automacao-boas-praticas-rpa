@@ -69,8 +69,18 @@ if uploaded_file:
         st.subheader("🔎 Fase 3: Validações de Estrutura de Processo")
 
         def validar_estrutura(arquivo, root):
+            atencao = []
             erros = []
             erros_registrados = set()
+
+            # validar subsheets publicados
+            for subsheet in root.findall("subsheet"):
+                name = subsheet.find("name")
+                name = name.text
+                if subsheet.get('published') == 'False':
+                    erro = f'subsheet "{name}" não está publicado.'
+                    erros.append(erro)
+                    erros_registrados.add(erro)
 
             for stage in root.iter("stage"):
                 tipo = stage.get("type", "").lower()
@@ -108,31 +118,43 @@ if uploaded_file:
                 if item.text and item.text.strip().lower() == "unknown":
                     erro = f"[{arquivo}] ⚠️ Há Data Item com tipo 'unknown'."
                     if erro not in erros_registrados:
-                        erros.append(erro)
+                        atencao.append(erro)
                         erros_registrados.add(erro)
 
-            return erros
+            return erros, atencao
 
         todos_erros = []
         total_erros = 0
 
         for nome_arquivo, xml_root in processos:
-            erros_encontrados = validar_estrutura(nome_arquivo, xml_root)
+            st.subheader(f'Processo: {nome_arquivo}')
+            erros_encontrados, atencao = validar_estrutura(nome_arquivo, xml_root)
             total_erros += len(erros_encontrados)
             if erros_encontrados:
+                st.subheader("Erros:")
                 for erro in erros_encontrados:
-                    st.error(erro)
+                    st.error(f'❌ {erro}')
                     todos_erros.append(erro)
+            if atencao:
+                st.subheader("Pontos de Atenção:")
+                for aviso in atencao:
+                    st.warning(f'⚠️ {aviso}')
             else:
                 st.success(f"✅ [{nome_arquivo}] - Nenhum erro estrutural encontrado.")
 
         for nome_arquivo, xml_root in objetos:
+            st.subheader(f'Objeto: {nome_arquivo}')
+
             erros_encontrados = validar_estrutura(nome_arquivo, xml_root)
             total_erros += len(erros_encontrados)
             if erros_encontrados:
                 for erro in erros_encontrados:
                     st.error(erro)
                     todos_erros.append(erro)
+            if atencao:
+                st.subheader("Pontos de Atenção:")
+                for aviso in atencao:
+                    st.warning(aviso)
             else:
                 st.success(f"✅ [{nome_arquivo}] - Nenhum erro estrutural encontrado.")
 
