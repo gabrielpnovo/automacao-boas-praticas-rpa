@@ -104,21 +104,6 @@ if uploaded_file:
         else:
             st.info("Nenhum objeto encontrado ou sem ID correspondente.")
 
-        # --- 6. Mostrar prévia do XML limpo ---
-        st.subheader("🧾 Prévia do XML limpo")
-        st.text_area("Conteúdo XML limpo", cleaned_content[:2000], height=300)
-
-        # --- 7. Download do XML limpo ---
-        cleaned_buffer = io.StringIO()
-        cleaned_buffer.write(cleaned_content)
-        cleaned_buffer.seek(0)
-        st.download_button(
-            label="📥 Baixar XML limpo",
-            data=cleaned_buffer.getvalue(),
-            file_name=f"{uploaded_file.name.replace('.bprelease', '')}_limpo.xml",
-            mime="application/xml"
-        )
-
     except ET.ParseError as e:
         st.error(f"Erro ao ler XML: {e}")
 
