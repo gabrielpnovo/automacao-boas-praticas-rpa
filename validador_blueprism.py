@@ -59,6 +59,7 @@ if uploaded_file:
         st.subheader("🔍 Validação de Publicação:")
 
         for file_name, root in processos:
+            print(f'root: {root}')
             is_published = root.get("published", "false").lower() == "true"
             if is_published:
                 st.success(f"✅ [{file_name}] - Processo está publicado.")

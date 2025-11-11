@@ -1,13 +1,11 @@
-def extrai_processos_e_objetos(root):
-    ns = {
-        'bpr': 'http://www.blueprism.co.uk/product/release',
-        'proc': 'http://www.blueprism.co.uk/product/process',
-        'procgrp': 'http://www.blueprism.co.uk/product/process-group',
-        'obj': 'http://www.blueprism.co.uk/product/object',
-        'objgrp': 'http://www.blueprism.co.uk/product/object-group'
-    }
+from .xml_utils import get_root_xml
+from .constants import NAMESPACES as ns
+from .models import BluePrismItem
+import xml.etree.ElementTree as ET
 
+def extrai_processos_e_objetos(root):
     processos, objetos = [], []
+
     process_groups = root.findall(".//procgrp:process-group", ns)
     object_groups = root.findall(".//objgrp:object-group", ns)
 
@@ -17,7 +15,11 @@ def extrai_processos_e_objetos(root):
             if pid:
                 proc = root.find(f".//proc:process[@id='{pid}']", ns)
                 if proc is not None and proc.get("name"):
-                    processos.append({"id": pid, "name": proc.get("name")})
+                    processos.append(BluePrismItem(
+                        id=pid,
+                        name=proc.get("name"),
+                        root=proc
+                    ))
 
     for group in object_groups:
         for member in group.findall(".//objgrp:members/objgrp:object", ns):
@@ -25,6 +27,10 @@ def extrai_processos_e_objetos(root):
             if oid:
                 obj = root.find(f".//obj:object[@id='{oid}']", ns) or root.find(f".//proc:object[@id='{oid}']", ns)
                 if obj is not None and obj.get("name"):
-                    objetos.append({"id": oid, "name": obj.get("name")})
+                    objetos.append(BluePrismItem(
+                        id=oid,
+                        name=obj.get("name"),
+                        root=obj
+                    ))
 
     return processos, objetos

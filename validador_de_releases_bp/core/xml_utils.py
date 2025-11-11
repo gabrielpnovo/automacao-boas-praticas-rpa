@@ -9,3 +9,6 @@ def limpa_arquivo(raw_data: bytes) -> str:
 
 def carrega_xml(text: str) -> ET.Element:
     return ET.fromstring(text)
+
+def get_root_xml(text: str) -> ET.Element:
+    return ET.ElementTree(ET.fromstring(text)).getroot()
