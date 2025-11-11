@@ -1,6 +1,6 @@
 from .xml_utils import get_root_xml
 from .constants import NAMESPACES as ns
-from .models import BluePrismItem
+from .models import BluePrismItem, BluePrismProcesso, BluePrismObjeto
 import xml.etree.ElementTree as ET
 
 def extrai_processos_e_objetos(root):
@@ -15,7 +15,7 @@ def extrai_processos_e_objetos(root):
             if pid:
                 proc = root.find(f".//proc:process[@id='{pid}']", ns)
                 if proc is not None and proc.get("name"):
-                    processos.append(BluePrismItem(
+                    processos.append(BluePrismProcesso(
                         id=pid,
                         name=proc.get("name"),
                         root=proc
@@ -27,7 +27,7 @@ def extrai_processos_e_objetos(root):
             if oid:
                 obj = root.find(f".//obj:object[@id='{oid}']", ns) or root.find(f".//proc:object[@id='{oid}']", ns)
                 if obj is not None and obj.get("name"):
-                    objetos.append(BluePrismItem(
+                    objetos.append(BluePrismObjeto(
                         id=oid,
                         name=obj.get("name"),
                         root=obj

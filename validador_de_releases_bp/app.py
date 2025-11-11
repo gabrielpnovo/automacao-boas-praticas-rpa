@@ -18,25 +18,22 @@ if uploaded_file:
     processos, objetos = extrai_processos_e_objetos(root_completa)
 
     # Fase 3 - 
-    st.subheader("🔍 Validação de Publicação:")
+    # st.subheader("🔍 Validações boas práticas:")
+    st.markdown("<h2 style='color:teal;'>🔍 Validações de Boas Práticas</h2>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color:teal;'>===== Processos =====</h3>", unsafe_allow_html=True)
     if processos:
         for processo in processos:
-            is_published = processo.root.get("published", "false").lower() == "true"
-            if is_published:
-                st.success(f"✅ [{processo.name}] - Processo está publicado.")
-            else:
-                st.error(f"❌ [{processo.name}] - Processo NÃO está publicado. Revisar!")
+            st.markdown(f"<h4 style='color:teal;'>{processo.name}</h4>", unsafe_allow_html=True)
+            if not processo.validar_publicacao():      
+                st.error(f"❌ Processo NÃO está publicado. Revisar!")
+                
     else:
         print("Nenhum processo encontrado com o ID informado.")
 
-
+    st.markdown("<h3 style='color:teal;'>===== Objetos =====</h3>", unsafe_allow_html=True)
     if objetos:
         for objeto in objetos:
-            is_published = objeto.root.get("published", "false").lower() == "true"
-            if is_published:    
-                st.success(f"✅ [{objeto.name}] - Objeto está publicado.")
-            else:
-                st.error(f"❌ [{objeto.name}] - Objeto NÃO está publicado. Revisar!")   
+            objeto.validar_publicacao_paginas()
 
     # --- Exibição no Streamlit ---
     # exibir_resultados(processos, objetos)
