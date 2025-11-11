@@ -2,6 +2,9 @@
 venv/
 .venv/
 
+# Ignorar a pasta de exemplos
+exemplos_de_codigos/
+
 # Cache do Python
 __pycache__/
 *.pyc
