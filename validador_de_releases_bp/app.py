@@ -25,7 +25,6 @@ if uploaded_file:
         for processo in processos:
             st.markdown(f"<h4 style='color:teal;'>{processo.name}</h4>", unsafe_allow_html=True)
             if not processo.validar_publicacao():      
-                processo.boas_praticas = False
                 st.error(f"❌ Processo NÃO está publicado. Revisar!")
             
 
