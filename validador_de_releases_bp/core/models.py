@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from .constants import NAMESPACES as ns
 from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 
@@ -31,9 +32,9 @@ class BPProcess(BPItem):
 class BPObject(BPItem):
     def validar_publicacao_paginas(self) -> bool:
         paginas_nao_publicadas = []
-        pages = self.root.findall(".//{http://www.blueprism.co.uk/product/process}subsheet")
+        pages = self.root.findall(".//proc:subsheet", ns)
         for page in pages:
-            nome = page.find("{http://www.blueprism.co.uk/product/process}name")
+            nome = page.find("proc:name", ns)
             if page.get('published') == "False" and nome.text not in ['Attach', 'Anotações', 'Activate']:
                 paginas_nao_publicadas.append(nome.text)
         return paginas_nao_publicadas
