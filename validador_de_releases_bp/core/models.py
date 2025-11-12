@@ -11,6 +11,9 @@ class BPItem(ABC):
     boas_praticas: bool = True
     # namespace: str = "http://www.blueprism.co.uk/product/process"
 
+    def teste(self):
+        print("Teste funcionando!")
+
     # @property
     # def ns(self):
     #     return {"bp": self.namespace}
