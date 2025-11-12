@@ -52,7 +52,10 @@ class BPItem(ABC):
 @dataclass
 class BPProcess(BPItem):
     def validar_publicacao(self) -> bool:
-        return self.root.get("published", "false").lower() == "true"
+        if self.root.get('published').lower() == "false":
+            self.boas_praticas = False
+            return False
+        return True
 
 @dataclass
 class BPObject(BPItem):
@@ -61,6 +64,6 @@ class BPObject(BPItem):
         pages = self.root.findall(".//proc:subsheet", ns)
         for page in pages:
             nome = page.find("proc:name", ns)
-            if page.get('published') == "False" and nome.text not in ['Attach', 'Anotações', 'Activate']:
+            if page.get('published').lower() == "false" and nome.text not in ['Attach', 'Anotações', 'Activate']:
                 paginas_nao_publicadas.append(nome.text)
         return paginas_nao_publicadas
