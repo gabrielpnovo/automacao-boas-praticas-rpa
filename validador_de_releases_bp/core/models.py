@@ -9,22 +9,45 @@ class BPItem(ABC):
     name: str
     root: ET.Element
     boas_praticas: bool = True
-    # namespace: str = "http://www.blueprism.co.uk/product/process"
 
-    def teste(self):
-        print("Teste funcionando!")
+    def validar_excecoes_repetidas(self) -> list[tuple[str, list[str]]]:
+        """
+        Verifica exceções repetidas (stages type='Exception' com o mesmo nome)
+        e retorna uma lista de tuplas (nome_excecao, [nomes_de_paginas]).
+        """
+        # Busca todas as exceções no XML
+        stages = self.root.findall(".//proc:stage[@type='Exception']", ns)
 
-    # @property
-    # def ns(self):
-    #     return {"bp": self.namespace}
-    
-    # def find(self, path: str) -> ET.Element | None:
-    #     """Busca um único elemento, aplicando namespace automaticamente"""
-    #     return self.root.find(path, self.ns)
+        excecoes_por_nome: dict[str, list[str]] = {}
 
-    # def find_all(self, path: str) -> list[ET.Element]:
-    #     """Busca múltiplos elementos, aplicando namespace automaticamente"""
-    #     return self.root.findall(path, self.ns)
+        for stage in stages:
+            nome_excecao = stage.get("name")
+            subsheetid_tag = stage.find("proc:subsheetid", ns)
+            if not (nome_excecao and subsheetid_tag is not None):
+                continue
+
+            subsheetid = subsheetid_tag.text.strip()
+            excecoes_por_nome.setdefault(nome_excecao, []).append(subsheetid)
+
+        # Identifica exceções repetidas
+        repetidas = {
+            nome: ids for nome, ids in excecoes_por_nome.items() if len(ids) > 1
+        }
+
+        resultado = []
+        for nome_excecao, subsheet_ids in repetidas.items():
+            paginas = []
+            for sid in subsheet_ids:
+                # Busca a subsheet correspondente
+                subsheet = self.root.find(f".//proc:subsheet[@subsheetid='{sid}']", ns)
+                if subsheet is not None:
+                    nome_pagina_tag = subsheet.find("proc:name", ns)
+                    if nome_pagina_tag is not None and nome_pagina_tag.text:
+                        paginas.append(nome_pagina_tag.text)
+            resultado.append((nome_excecao, paginas))
+
+        return resultado
+
     
 @dataclass
 class BPProcess(BPItem):

@@ -28,7 +28,12 @@ if uploaded_file:
                 processo.boas_praticas = False
                 st.error(f"❌ Processo NÃO está publicado. Revisar!")
             
-
+            excecoes_repetidas = processo.validar_excecoes_repetidas()
+            if excecoes_repetidas:
+                processo.boas_praticas = False
+                for excecao, paginas in excecoes_repetidas:
+                    paginas_str = ", ".join(paginas)
+                    st.error(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
 
             if processo.boas_praticas:
                 st.success("✅ Processo dentro das boas práticas")
@@ -38,7 +43,6 @@ if uploaded_file:
     st.markdown("<h3 style='color:teal;'>===== Objetos =====</h3>", unsafe_allow_html=True)
     if objetos:
         for objeto in objetos:
-            objeto.teste()
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
             paginas_nao_publicadas = objeto.validar_publicacao_paginas()
 
@@ -47,6 +51,12 @@ if uploaded_file:
                 for pagina in paginas_nao_publicadas:
                     st.error(f"❌ Ação '{pagina}' NÃO está publicada. Revisar!")
             
+            excecoes_repetidas = objeto.validar_excecoes_repetidas()
+            if excecoes_repetidas:
+                objeto.boas_praticas = False
+                for excecao, paginas in excecoes_repetidas:
+                    paginas_str = ", ".join(paginas)
+                    st.error(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
             
             if objeto.boas_praticas:
                 st.success("✅ Objeto dentro das boas práticas")     
