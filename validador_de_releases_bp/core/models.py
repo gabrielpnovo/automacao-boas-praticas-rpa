@@ -3,35 +3,37 @@ from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 
 @dataclass
-class BluePrismItem(ABC):
+class BPItem(ABC):
     id: str
     name: str
     root: ET.Element
-    namespace: str = "http://www.blueprism.co.uk/product/process"
+    boas_praticas: bool = True
+    # namespace: str = "http://www.blueprism.co.uk/product/process"
 
-    @property
-    def ns(self):
-        return {"bp": self.namespace}
+    # @property
+    # def ns(self):
+    #     return {"bp": self.namespace}
     
-    def find(self, path: str) -> ET.Element | None:
-        """Busca um único elemento, aplicando namespace automaticamente"""
-        return self.root.find(path, self.ns)
+    # def find(self, path: str) -> ET.Element | None:
+    #     """Busca um único elemento, aplicando namespace automaticamente"""
+    #     return self.root.find(path, self.ns)
 
-    def find_all(self, path: str) -> list[ET.Element]:
-        """Busca múltiplos elementos, aplicando namespace automaticamente"""
-        return self.root.findall(path, self.ns)
+    # def find_all(self, path: str) -> list[ET.Element]:
+    #     """Busca múltiplos elementos, aplicando namespace automaticamente"""
+    #     return self.root.findall(path, self.ns)
     
 @dataclass
-class BluePrismProcesso(BluePrismItem):
+class BPProcess(BPItem):
     def validar_publicacao(self) -> bool:
         return self.root.get("published", "false").lower() == "true"
 
 @dataclass
-class BluePrismObjeto(BluePrismItem):
+class BPObject(BPItem):
     def validar_publicacao_paginas(self) -> bool:
-        print(self.root)
-        pages = self.find_all(".//bp:subsheet")
-        print('entrou')
+        paginas_nao_publicadas = []
+        pages = self.root.findall(".//{http://www.blueprism.co.uk/product/process}subsheet")
         for page in pages:
             nome = page.find("{http://www.blueprism.co.uk/product/process}name")
-            print(nome.text)
+            if page.get('published') == "False" and nome.text not in ['Attach', 'Anotações', 'Activate']:
+                paginas_nao_publicadas.append(nome.text)
+        return paginas_nao_publicadas
