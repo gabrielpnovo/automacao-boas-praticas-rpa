@@ -20,11 +20,11 @@ class BPItem(ABC):
     mas_praticas: list[str] = field(default_factory=list, init=False)
 
     def __post_init__(self):
-        self._popular_subsheets()
-        self._popular_stages()
-        self.popular_data_items()
+        self.__popular_subsheets()
+        self.__popular_stages()
+        self.__popular_data_items()
 
-    def _popular_subsheets(self):
+    def __popular_subsheets(self):
         for subsheet in self.root.findall(".//proc:subsheet", ns):
             subsheet_id = subsheet.get("subsheetid")
             name_tag = subsheet.find("proc:name", ns)
@@ -38,7 +38,7 @@ class BPItem(ABC):
                     "published": published
                 }
 
-    def _popular_stages(self):
+    def __popular_stages(self):
         for stage in self.root.findall(".//proc:stage", ns):
             stage_id = stage.get("stageid")
             name = stage.get("name")
@@ -54,7 +54,7 @@ class BPItem(ABC):
                     "subsheetid": subsheetid
                 }
 
-    def popular_data_items(self):
+    def __popular_data_items(self):
         for stage in self.root.findall(".//proc:stage", ns):
             if stage.get("type") == "Data":
                 stage_id = stage.get("stageid")
@@ -70,6 +70,9 @@ class BPItem(ABC):
                         "initialvalue": initial_value_tag.text if initial_value_tag is not None else None                        
                     }
 
+    def __get_subsheet_name_by_id(self, subsheetid: str) -> str:
+        return self.subsheets[subsheetid]['name']
+        
     def validar_excecoes_repetidas(self):
         exception_stages = {
             stage_id: info
@@ -97,7 +100,7 @@ class BPItem(ABC):
                     nomes_paginas = []
                     for exc in exception_duplicada.values():
                         
-                        exception_subsheet_name = self.subsheets[exc.get('subsheetid')]['name']
+                        exception_subsheet_name = self.__get_subsheet_name_by_id(exc.get('subsheetid'))
                         nomes_paginas.append(exception_subsheet_name)
                     repetidas.append((exception.get('name'), nomes_paginas))
         
@@ -105,17 +108,26 @@ class BPItem(ABC):
             paginas_str = ", ".join(paginas)
             self.mas_praticas.append(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
         
-    # def validar_senhas_expostas(self):
-        
+    def validar_senhas_expostas(self):
+        data_items_expostos = {
+            stage_id: info
+            for stage_id, info in self.data_items.items()
+            if (
+                any(palavra in info["name"].lower() for palavra in ["senha", "password", "pass"])
+                and info.get("datatype") != "password"
+            )
+        }
+        for items in data_items_expostos.values():
+            subsheet_name = self.__get_subsheet_name_by_id(items['subsheetid'])
+            self.mas_praticas.append(f"⚠️ Validar se Data Item {items['name']} na página {subsheet_name} não deveria ser do tipo password")
+       
 @dataclass
 class BPProcess(BPItem):
     # verificar se ta None
-    def validar_publicacao(self) -> bool:
+    def validar_publicacao(self):
         if self.root.get('published') is None:
             self.boas_praticas = False
             self.mas_praticas.append("❌ Processo NÃO está publicado. Revisar!")
-            return False
-        return True
 
 @dataclass
 class BPObject(BPItem):

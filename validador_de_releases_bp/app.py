@@ -16,6 +16,8 @@ if uploaded_file:
     root_completa= get_root_xml(xml_text)
 
     # Fase 2 - Extração de processos e objetos ---
+    processos: list[BPProcess]
+    objetos:list[BPObject]
     processos, objetos = extrai_processos_e_objetos(root_completa)
 
     # Fase 3 - 
@@ -29,6 +31,7 @@ if uploaded_file:
 
             processo.validar_publicacao()
             processo.validar_excecoes_repetidas()
+            processo.validar_senhas_expostas()
 
             if len(processo.mas_praticas)>0:
                 for alerta in processo.mas_praticas:
