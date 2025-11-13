@@ -143,11 +143,13 @@ class BPProcess(BPItem):
 
 @dataclass
 class BPObject(BPItem):
+    elements: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
+    
+
     def validar_publicacao_paginas(self) -> bool:
-        paginas_nao_publicadas = []
-        pages = self.root.findall(".//proc:subsheet", ns)
-        for page in pages:
-            nome = page.find("proc:name", ns)
-            if page.get('published').lower() == "false" and nome.text not in ['Attach', 'Anotações', 'Activate']:
-                paginas_nao_publicadas.append(nome.text)
-        return paginas_nao_publicadas
+
+        for valor in self.subsheets.values():
+            if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate']:
+                print(f'Página não está publicada: {valor['name']}')
+                self.boas_praticas = False
+                self.mas_praticas.append(f'❌ Página "{valor['name']}" NÃO está publicada. Revisar!')
