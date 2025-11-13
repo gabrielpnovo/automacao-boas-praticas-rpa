@@ -21,6 +21,8 @@ def extrai_processos_e_objetos(root):
                         root=proc
                     ))
 
+    print('MONTOU PROCESSOS-----------------------------------------------')
+
     for group in object_groups:
         for member in group.findall(".//objgrp:members/objgrp:object", ns):
             oid = member.get("id")
@@ -32,5 +34,6 @@ def extrai_processos_e_objetos(root):
                         name=obj.get("name"),
                         root=obj
                     ))
+    print('MONTOU OBJETOS-----------------------------------------------')
 
     return processos, objetos
