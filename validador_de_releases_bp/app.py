@@ -54,17 +54,7 @@ if uploaded_file:
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
                         
             objeto.validar_publicacao_paginas()
-
-
             objeto.validar_excecoes_repetidas()
-            
-            excecoes_repetidas = objeto.validar_excecoes_repetidas()
-            if excecoes_repetidas:
-                objeto.boas_praticas = False
-                for excecao, paginas in excecoes_repetidas:
-                    paginas_str = ", ".join(paginas)
-                    st.error(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
-            
             objeto.validar_data_item_sem_type()
             objeto.validar_senhas_expostas()
 
