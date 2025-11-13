@@ -16,12 +16,13 @@ class BPItem(ABC):
     subsheets: dict[str, dict[str, str | bool]] = field(default_factory=dict, init=False)
     # estrutura de stages = stageid: {name:str, type:str, subsheetid:str}
     stages: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
+    data_items: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
     mas_praticas: list[str] = field(default_factory=list, init=False)
-    
 
     def __post_init__(self):
         self._popular_subsheets()
         self._popular_stages()
+        self.popular_data_items()
 
     def _popular_subsheets(self):
         for subsheet in self.root.findall(".//proc:subsheet", ns):
@@ -53,6 +54,21 @@ class BPItem(ABC):
                     "subsheetid": subsheetid
                 }
 
+    def popular_data_items(self):
+        for stage in self.root.findall(".//proc:stage", ns):
+            if stage.get("type") == "Data":
+                stage_id = stage.get("stageid")
+                name = stage.get("name")
+                data_type = stage.find("proc:datatype", ns)
+                subsheetid_tag = stage.find("proc:subsheetid", ns)
+                initial_value_tag = stage.find("proc:initialvalue", ns)
+                if stage_id and name:
+                    self.data_items[stage_id] = {
+                        "name": name,
+                        "datatype": data_type.text if data_type is not None else None,
+                        "subsheetid": subsheetid_tag.text.strip() if subsheetid_tag is not None and subsheetid_tag.text else None,
+                        "initialvalue": initial_value_tag.text if initial_value_tag is not None else None                        
+                    }
 
     def validar_excecoes_repetidas(self):
         exception_stages = {
@@ -73,7 +89,7 @@ class BPItem(ABC):
                 if qtd_repeticoes > 1:
                     
                     self.boas_praticas = False
-                    
+
                     # separa exceptions:
                     exception_duplicada = {k: v for k, v in exception_stages.items() if v.get('name') == exception.get('name')}
 
@@ -89,8 +105,8 @@ class BPItem(ABC):
             paginas_str = ", ".join(paginas)
             self.mas_praticas.append(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
         
-
-    
+    # def validar_senhas_expostas(self):
+        
 @dataclass
 class BPProcess(BPItem):
     # verificar se ta None
