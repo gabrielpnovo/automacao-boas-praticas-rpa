@@ -52,13 +52,11 @@ if uploaded_file:
         for objeto in objetos:
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
-            paginas_nao_publicadas = objeto.validar_publicacao_paginas()
-            # objeto.validar_publicacao_paginas()
+                        
+            objeto.validar_publicacao_paginas()
+
+
             objeto.validar_excecoes_repetidas()
-            if paginas_nao_publicadas:
-                objeto.boas_praticas = False
-                for pagina in paginas_nao_publicadas:
-                    st.error(f"❌ Ação '{pagina}' NÃO está publicada. Revisar!")
             
             excecoes_repetidas = objeto.validar_excecoes_repetidas()
             if excecoes_repetidas:
