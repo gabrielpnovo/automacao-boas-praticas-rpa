@@ -31,10 +31,15 @@ if uploaded_file:
 
             processo.validar_publicacao()
             processo.validar_excecoes_repetidas()
+            processo.validar_data_item_sem_type()
             processo.validar_senhas_expostas()
 
             if len(processo.mas_praticas)>0:
                 for alerta in processo.mas_praticas:
+                    st.error(alerta)
+
+            if len(processo.erros)>0:
+                for erro in processo.erros:
                     st.error(alerta)
 
             if processo.boas_praticas:
@@ -61,9 +66,16 @@ if uploaded_file:
                 for excecao, paginas in excecoes_repetidas:
                     paginas_str = ", ".join(paginas)
                     st.error(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
+            
+            objeto.validar_data_item_sem_type()
+            objeto.validar_senhas_expostas()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
+                    st.error(alerta)
+
+            if len(processo.erros)>0:
+                for erro in processo.erros:
                     st.error(alerta)
 
             if objeto.boas_praticas:

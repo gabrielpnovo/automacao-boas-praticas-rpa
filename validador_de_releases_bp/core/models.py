@@ -18,6 +18,8 @@ class BPItem(ABC):
     stages: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
     data_items: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
     mas_praticas: list[str] = field(default_factory=list, init=False)
+    erros: list[str] = field(default_factory=list, init=False)
+
 
     def __post_init__(self):
         self.__popular_subsheets()
@@ -90,7 +92,6 @@ class BPItem(ABC):
                 qtd_repeticoes = sum(1 for v in exception_stages.values() if v.get('name') == exception.get('name'))
 
                 if qtd_repeticoes > 1:
-                    
                     self.boas_praticas = False
 
                     # separa exceptions:
@@ -99,7 +100,6 @@ class BPItem(ABC):
                     # busca nomes das subsheets
                     nomes_paginas = []
                     for exc in exception_duplicada.values():
-                        
                         exception_subsheet_name = self.__get_subsheet_name_by_id(exc.get('subsheetid'))
                         nomes_paginas.append(exception_subsheet_name)
                     repetidas.append((exception.get('name'), nomes_paginas))
@@ -108,6 +108,17 @@ class BPItem(ABC):
             paginas_str = ", ".join(paginas)
             self.mas_praticas.append(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
         
+    def validar_data_item_sem_type(self):
+        sem_datatype = {
+            stage_id: info
+            for stage_id, info in self.data_items.items()
+            if info.get("datatype") is None
+        }
+        for items in sem_datatype.values():
+            self.boas_praticas = False
+            subsheet_name = self.__get_subsheet_name_by_id(items['subsheetid'])
+            self.erros.append(f"❌ Data Item {items['name']} na página {subsheet_name} está sem um tipo atribuído. Revisar!")
+
     def validar_senhas_expostas(self):
         data_items_expostos = {
             stage_id: info
@@ -118,6 +129,7 @@ class BPItem(ABC):
             )
         }
         for items in data_items_expostos.values():
+            self.boas_praticas = False
             subsheet_name = self.__get_subsheet_name_by_id(items['subsheetid'])
             self.mas_praticas.append(f"⚠️ Validar se Data Item {items['name']} na página {subsheet_name} não deveria ser do tipo password")
        
