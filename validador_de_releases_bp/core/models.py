@@ -53,88 +53,40 @@ class BPItem(ABC):
                     "subsheetid": subsheetid
                 }
 
+
     def validar_excecoes_repetidas(self):
-
-    # def validar_excecoes_repetidas(self) -> list[tuple[str, list[str]]]:
-        """
-        Verifica exceções repetidas (stages type='Exception' com o mesmo nome)
-        e retorna uma lista de tuplas (nome_excecao, [nomes_de_paginas]).
-        """
-
-        print('VALIDANDO EXCEÇÕES REPETIDAS-----------------------------------------------')
         exception_stages = {
             stage_id: info
             for stage_id, info in self.stages.items()
             if info.get("type") == "Exception"
         }
-        print(f'EXCEPTION STAGES')
-        # Agrupa os stages por nome
-        grouped_by_name = defaultdict(list)
-        for stage_id, info in exception_stages.items():
-            grouped_by_name[info["name"]].append((stage_id, info))
-        print('GROUPED BY NAME')
+
+        repetidas = []
+
+        for exception in exception_stages.values():
+            
+            # verifica se essa exception duplicada já está na lista de repetidas
+            if not any(exception.get('name') == d[0] for d in repetidas):
+                # busca qtd de repeticoes e verifica se é duplicada:
+                qtd_repeticoes = sum(1 for v in exception_stages.values() if v.get('name') == exception.get('name'))
+
+                if qtd_repeticoes > 1:
+
+                    # separa exceptions:
+                    exception_duplicada = {k: v for k, v in exception_stages.items() if v.get('name') == exception.get('name')}
+
+                    # busca nomes das subsheets
+                    nomes_paginas = []
+                    for exc in exception_duplicada.values():
+                        
+                        exception_subsheet_name = self.subsheets[exc.get('subsheetid')]['name']
+                        nomes_paginas.append(exception_subsheet_name)
+                    repetidas.append((exception.get('name'), nomes_paginas))
         
-        # CORRIGIR ESSA PARTE QUE NÃO FUNCIONA:
-        # Monta a lista de exceções repetidas com os nomes das subsheets
-        # resultado = []
-        # for name, infos in grouped_by_name.items():
-        #     if len(infos) > 1:
-        #         nomes_paginas = []
-        #         for info in infos:
-        #             subsheetid = info.get("subsheetid")
-        #             if subsheetid and subsheetid in self.subsheets:
-        #                 nome_pagina = self.subsheets[subsheetid]["name"]
-        #                 nomes_paginas.append(nome_pagina)
-        #         resultado.append((name, nomes_paginas))
-
-        # return resultado
-        return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # # Busca todas as exceções no XML
-        # stages = self.root.findall(".//proc:stage[@type='Exception']", ns)
-
-        # excecoes_por_nome: dict[str, list[str]] = {}
-
-        # for stage in stages:
-        #     nome_excecao = stage.get("name")
-        #     subsheetid_tag = stage.find("proc:subsheetid", ns)
-        #     if not (nome_excecao and subsheetid_tag is not None):
-        #         continue
-
-        #     subsheetid = subsheetid_tag.text.strip()
-        #     excecoes_por_nome.setdefault(nome_excecao, []).append(subsheetid)
-
-        # # Identifica exceções repetidas
-        # repetidas = {
-        #     nome: ids for nome, ids in excecoes_por_nome.items() if len(ids) > 1
-        # }
-
-        # resultado = []
-        # for nome_excecao, subsheet_ids in repetidas.items():
-        #     paginas = []
-        #     for sid in subsheet_ids:
-        #         # Busca a subsheet correspondente
-        #         subsheet = self.root.find(f".//proc:subsheet[@subsheetid='{sid}']", ns)
-        #         if subsheet is not None:
-        #             nome_pagina_tag = subsheet.find("proc:name", ns)
-        #             if nome_pagina_tag is not None and nome_pagina_tag.text:
-        #                 paginas.append(nome_pagina_tag.text)
-        #     resultado.append((nome_excecao, paginas))
-
-        # return resultado
+        for excecao, paginas in repetidas:
+            paginas_str = ", ".join(paginas)
+            self.mas_praticas.append(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
+        
 
     
 @dataclass
@@ -143,6 +95,7 @@ class BPProcess(BPItem):
     def validar_publicacao(self) -> bool:
         if self.root.get('published') is None:
             self.boas_praticas = False
+            self.mas_praticas.append("❌ Processo NÃO está publicado. Revisar!")
             return False
         return True
 

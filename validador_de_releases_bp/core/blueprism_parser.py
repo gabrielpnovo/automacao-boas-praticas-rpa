@@ -4,7 +4,8 @@ from .models import BPProcess, BPObject
 import xml.etree.ElementTree as ET
 
 def extrai_processos_e_objetos(root):
-    processos, objetos = [], []
+    processos = []
+    objetos = []
 
     process_groups = root.findall(".//procgrp:process-group", ns)
     object_groups = root.findall(".//objgrp:object-group", ns)
@@ -21,8 +22,6 @@ def extrai_processos_e_objetos(root):
                         root=proc
                     ))
 
-    print('MONTOU PROCESSOS-----------------------------------------------')
-
     for group in object_groups:
         for member in group.findall(".//objgrp:members/objgrp:object", ns):
             oid = member.get("id")
@@ -34,6 +33,5 @@ def extrai_processos_e_objetos(root):
                         name=obj.get("name"),
                         root=obj
                     ))
-    print('MONTOU OBJETOS-----------------------------------------------')
 
     return processos, objetos
