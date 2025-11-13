@@ -71,7 +71,9 @@ class BPItem(ABC):
                 qtd_repeticoes = sum(1 for v in exception_stages.values() if v.get('name') == exception.get('name'))
 
                 if qtd_repeticoes > 1:
-
+                    
+                    self.boas_praticas = False
+                    
                     # separa exceptions:
                     exception_duplicada = {k: v for k, v in exception_stages.items() if v.get('name') == exception.get('name')}
 
