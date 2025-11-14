@@ -33,6 +33,8 @@ if uploaded_file:
             processo.validar_excecoes_repetidas()
             processo.validar_data_item_sem_type()
             processo.validar_senhas_expostas()
+            processo.validar_exception_type()
+            processo.validar_initial_value_dos_data_items()
 
             if len(processo.mas_praticas)>0:
                 for alerta in processo.mas_praticas:
@@ -53,15 +55,13 @@ if uploaded_file:
             print('============================================================ NOVA EXECUCAO ============================================================')
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
-
-            # if objeto.name == 'BankManager_Basic_Edge':
-            #     pass
-            objeto.verificar_match_index()
-            # objeto.verificar_atributo_vazio()
-            # objeto.validar_publicacao_paginas()
-            # objeto.validar_excecoes_repetidas()
-            # objeto.validar_data_item_sem_type()
-            # objeto.validar_senhas_expostas()
+                        
+            objeto.validar_publicacao_paginas()
+            objeto.validar_excecoes_repetidas()
+            objeto.validar_data_item_sem_type()
+            objeto.validar_senhas_expostas()
+            objeto.validar_exception_type()
+            objeto.validar_initial_value_dos_data_items()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
