@@ -50,13 +50,18 @@ if uploaded_file:
     st.markdown("<h3 style='color:teal;'>===== Objetos =====</h3>", unsafe_allow_html=True)
     if objetos:
         for objeto in objetos:
+            print('============================================================ NOVA EXECUCAO ============================================================')
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
-                        
-            objeto.validar_publicacao_paginas()
-            objeto.validar_excecoes_repetidas()
-            objeto.validar_data_item_sem_type()
-            objeto.validar_senhas_expostas()
+
+            # if objeto.name == 'BankManager_Basic_Edge':
+            #     pass
+            objeto.verificar_match_index()
+            # objeto.verificar_atributo_vazio()
+            # objeto.validar_publicacao_paginas()
+            # objeto.validar_excecoes_repetidas()
+            # objeto.validar_data_item_sem_type()
+            # objeto.validar_senhas_expostas()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
