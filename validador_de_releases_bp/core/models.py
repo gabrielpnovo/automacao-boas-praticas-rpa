@@ -162,7 +162,19 @@ class BPItem(ABC):
             self.mas_praticas.append(
                 f"❌ Exception '{nome}' na página {pagina} possui tipo inválido: '{tipo}'. Ajustar para Business Exception ou System Exception."
             )
-        
+    
+    def validar_initial_value_dos_data_items(self):
+        data_items_com_valor_inicial = {
+            stage_id: info
+            for stage_id, info in self.data_items.items()
+            if info.get("initialvalue") not in (None, "")
+        }
+        for info in data_items_com_valor_inicial.values():
+            self.boas_praticas = False
+            pagina = self.__get_subsheet_name_by_id(info["subsheetid"])
+            self.mas_praticas.append(
+                f"⚠️ Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
+            )   
        
 @dataclass
 class BPProcess(BPItem):
