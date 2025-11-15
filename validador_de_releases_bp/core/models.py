@@ -198,9 +198,63 @@ class BPProcess(BPItem):
 
 @dataclass
 class BPObject(BPItem):
-    elements: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
-    
+    elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
 
+    def __popular_elementos(self):
+        for element in self.root.findall(".//proc:element", ns):
+            if element.get('name') is not None:
+                name = element.get('name')
+                id = element.find("proc:id", ns).text
+                
+                attributes = element.find("proc:attributes", ns)
+                if attributes is not None:
+                    self.elements[id] = {
+                        "name": name
+                    }
+                    attributes = attributes.findall("proc:attribute", ns)
+                    for attribute in attributes:
+                        
+                        self.elements[id].setdefault("atributes", [])
+
+                        valor_atributo = attribute.find('proc:ProcessValue', ns).get('value')
+                        
+                        
+                        if attribute.get('inuse') is not None:
+                            # print(f'ATRIBUTO EM USO: {attribute.get("name")}')
+                            
+                            self.elements[id]["atributes"].append({
+                                "name": attribute.get("name"),
+                                "inuse": True,
+                                "value": valor_atributo
+                            })
+                        else:
+                            # print(f'ATRIBUTO NÃO EM USO: {attribute.get("name")}')
+                            self.elements[id]["atributes"].append({
+                                "name": attribute.get("name"),
+                                "inuse": False,
+                                "value": valor_atributo
+                            })
+
+    def __post_init__(self):
+        self.__popular_elementos()
+    
+    def validar_atributo_vazio(self):
+        for valor in self.elements.values():
+            for atributo in valor['atributes']:
+                if atributo['inuse'] and (atributo['value'] is None or atributo['value'].strip() == ""):
+                    # print(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio.')
+                    self.boas_praticas = False
+                    self.mas_praticas.append(f'❌ Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio. Revisar!')
+
+    def validar_match_index(self):
+        for valor in self.elements.values():
+            for atributo in valor['atributes']:
+                if atributo['name'].lower() == 'matchindex' and atributo['inuse'] == False:
+                    print(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio.')
+                    self.boas_praticas = False
+                    self.mas_praticas.append(f'⚠️ Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está DESATIVADO. Revisar!')
+    
+    
     def validar_publicacao_paginas(self):
         for valor in self.subsheets.values():
             if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate', 'Detach','Clean Up', 'Anotações']:

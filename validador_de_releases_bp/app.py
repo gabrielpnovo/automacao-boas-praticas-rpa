@@ -51,6 +51,7 @@ if uploaded_file:
     st.markdown("<h3 style='color:teal;'>===== Objetos =====</h3>", unsafe_allow_html=True)
     if objetos:
         for objeto in objetos:
+            print('============================================================ NOVA EXECUCAO ============================================================')
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
                         
