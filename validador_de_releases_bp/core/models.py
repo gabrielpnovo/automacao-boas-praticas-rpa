@@ -49,11 +49,21 @@ class BPItem(ABC):
             subsheetid = (
                 subsheetid_tag.text.strip() if subsheetid_tag is not None and subsheetid_tag.text else None
             )
+            onsuccess_stage_tag = stage.find("proc:onsuccess", ns)
+            onsuccess_stage_id = (
+                onsuccess_stage_tag.text.strip() if onsuccess_stage_tag is not None and onsuccess_stage_tag.text else None
+            )
+            processid_tag = stage.find("proc:processid", ns)
+            processid = (
+                processid_tag.text.strip() if processid_tag is not None and processid_tag.text else None
+            )
             if stage_id and name and type:
                 self.stages[stage_id] = {
                     "name": name,
                     "type": type,
-                    "subsheetid": subsheetid
+                    "subsheetid": subsheetid,
+                    "onsuccess_stage_id": onsuccess_stage_id,
+                    "processid": processid
                 }
 
     def __popular_data_items(self):
@@ -164,10 +174,11 @@ class BPItem(ABC):
             )
     
     def validar_initial_value_dos_data_items(self):
+        # obs: só filtro por subsheet_id not None porque a página Initialise não tem subsheet_id e também porque as variáveis nela terão necessariamente que ter initial value, então não precisam ser considerados
         data_items_com_valor_inicial = {
             stage_id: info
             for stage_id, info in self.data_items.items()
-            if info.get("initialvalue") not in (None, "")
+            if info.get("initialvalue") not in (None, "") and info.get("subsheet_id") is not None
         }
         for info in data_items_com_valor_inicial.values():
             self.boas_praticas = False
@@ -176,6 +187,7 @@ class BPItem(ABC):
                 f"⚠️ Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
             )   
        
+
 @dataclass
 class BPProcess(BPItem):
     # verificar se ta None
@@ -189,10 +201,57 @@ class BPObject(BPItem):
     elements: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
     
 
-    def validar_publicacao_paginas(self) -> bool:
-
+    def validar_publicacao_paginas(self):
         for valor in self.subsheets.values():
-            if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate']:
+            if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate', 'Detach','Clean Up', 'Anotações']:
                 print(f'Página não está publicada: {valor['name']}')
                 self.boas_praticas = False
                 self.mas_praticas.append(f'❌ Página "{valor['name']}" NÃO está publicada. Revisar!')
+
+    def validar_attach_ou_activate_das_pags(self):
+        subsheets_attach_activate = {
+            subsheet_id: info
+            for subsheet_id, info in self.subsheets.items()
+            if info.get('name') in ('Attach', 'Activate', 'Activate Application')
+        }
+        attach_activate_ids = set(subsheets_attach_activate.keys())
+        subsheets_normais = {
+            subsheet_id: info
+            for subsheet_id, info in self.subsheets.items()
+            if info.get('name') not in ('Attach', 'Launch', 'Clean Up', 'Anotações')
+        }
+        for subsheet_id, info in subsheets_normais.items():
+            # encontra o stage Start da página atual
+            start_stage = None
+            stages_da_subsheet = {
+                stage_id: info
+                for stage_id, info in self.stages.items()
+                if info.get('subsheetid') == subsheet_id
+            }
+            for stage in stages_da_subsheet.values():
+                if stage.get('type') == 'Start':
+                    start_stage = stage
+                    break
+            # pega o onsuccess do Start
+            onsuccess_stage_id = start_stage.get('onsuccess_stage_id')
+            # busca o stage apontado pelo onsuccess
+            prox_stage = stages_da_subsheet.get(onsuccess_stage_id)
+            if prox_stage is None:
+                self.boas_praticas = False
+                pagina = info['name']
+                print(
+                    f"❌ A página '{pagina}' possui um Start cujo On Success não aponta para um stage válido."
+                )
+                continue
+            
+            # verifica se o stage é um SubSheet e o processid é um attach/activate
+            if prox_stage.get('type') != 'SubSheet' and prox_stage.get('processid') not in attach_activate_ids:
+                self.boas_praticas = False
+                pagina = info['name']
+                self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
+
+    def validar_uso_region(self):
+        for tag in ["region", "region-container"]:
+            for region in self.root.findall(f".//proc:{tag}", ns):
+                self.boas_praticas = False
+                self.mas_praticas.append(f"❌ O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")

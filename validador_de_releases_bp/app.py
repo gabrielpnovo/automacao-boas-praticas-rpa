@@ -34,7 +34,6 @@ if uploaded_file:
             processo.validar_data_item_sem_type()
             processo.validar_senhas_expostas()
             processo.validar_exception_type()
-            processo.validar_initial_value_dos_data_items()
 
             if len(processo.mas_praticas)>0:
                 for alerta in processo.mas_praticas:
@@ -61,6 +60,8 @@ if uploaded_file:
             objeto.validar_senhas_expostas()
             objeto.validar_exception_type()
             objeto.validar_initial_value_dos_data_items()
+            objeto.validar_attach_ou_activate_das_pags()
+            objeto.validar_uso_region()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
