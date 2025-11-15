@@ -200,6 +200,9 @@ class BPProcess(BPItem):
 class BPObject(BPItem):
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
 
+    def __post_init__(self):
+        self.__popular_elementos()
+
     def __popular_elementos(self):
         for element in self.root.findall(".//proc:element", ns):
             if element.get('name') is not None:
@@ -234,9 +237,6 @@ class BPObject(BPItem):
                                 "inuse": False,
                                 "value": valor_atributo
                             })
-
-    def __post_init__(self):
-        self.__popular_elementos()
     
     def validar_atributo_vazio(self):
         for valor in self.elements.values():
@@ -254,7 +254,12 @@ class BPObject(BPItem):
                     self.boas_praticas = False
                     self.mas_praticas.append(f'⚠️ Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está DESATIVADO. Revisar!')
     
-    
+    def validar_uso_region(self):
+        for tag in ["region", "region-container"]:
+            for region in self.root.findall(f".//proc:{tag}", ns):
+                self.boas_praticas = False
+                self.mas_praticas.append(f"❌ O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")
+            
     def validar_publicacao_paginas(self):
         for valor in self.subsheets.values():
             if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate', 'Detach','Clean Up', 'Anotações']:
@@ -304,8 +309,3 @@ class BPObject(BPItem):
                 pagina = info['name']
                 self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
 
-    def validar_uso_region(self):
-        for tag in ["region", "region-container"]:
-            for region in self.root.findall(f".//proc:{tag}", ns):
-                self.boas_praticas = False
-                self.mas_praticas.append(f"❌ O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")
