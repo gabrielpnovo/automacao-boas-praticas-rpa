@@ -353,6 +353,16 @@ class BPObject(BPItem):
                 pagina = info['name']
                 self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
 
+    def wait_stage_sem_elemento(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "WaitStart":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                
+                if not stage_xml.findall(".//proc:choice", ns):
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
+
 
     
 
