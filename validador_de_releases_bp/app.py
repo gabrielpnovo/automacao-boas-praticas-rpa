@@ -65,6 +65,7 @@ if uploaded_file:
             objeto.validar_uso_region()
             objeto.validar_decision_vazia()
             objeto.validar_saida_decision()
+            objeto.validar_exception_vazia()    
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
@@ -72,7 +73,7 @@ if uploaded_file:
 
             if len(objeto.erros)>0:
                 for erro in objeto.erros:
-                    st.error(alerta)
+                    st.error(erro)
 
             if objeto.boas_praticas:
                 st.success("✅ Objeto dentro das boas práticas")     

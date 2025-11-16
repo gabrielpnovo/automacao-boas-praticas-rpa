@@ -185,7 +185,50 @@ class BPItem(ABC):
             pagina = self._get_subsheet_name_by_id(info["subsheetid"])
             self.mas_praticas.append(
                 f"⚠️ Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
-            )   
+            )
+
+    def validar_decision_vazia(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "Decision":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                if stage_xml.find("proc:decision", ns).get('expression').strip() == "":
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
+
+    def validar_saida_decision(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "Decision":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                # verifica saída yes
+                if stage_xml.find("proc:ontrue", ns) is None:
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Sim" definida. Revisar!')
+
+                # verifica saída no
+                if stage_xml.find("proc:onfalse", ns) is None:
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Não" definida. Revisar!')
+
+    def validar_exception_vazia(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "Exception":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                exception_tag = stage_xml.find("proc:exception", ns)
+
+                #verifica exception type vazio
+                if exception_tag.get('usecurrent') is None and exception_tag.get('type').strip() == '':
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ "Exception Type" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
+
+                #verifica exception detail vazia
+                if exception_tag.get('usecurrent') is None and exception_tag.get('detail').strip() == '':
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.erros.append(f'❌ "Exception Detail" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
        
 
 @dataclass
@@ -310,28 +353,6 @@ class BPObject(BPItem):
                 pagina = info['name']
                 self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
 
-    def validar_decision_vazia(self):
-        for stage_id, info in self.stages.items():
-            if info['type'] == "Decision":
-                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
-                if stage_xml.find("proc:decision", ns).get('expression').strip() == "":
-                    self.boas_praticas = False
-                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
 
-    def validar_saida_decision(self):
-        for stage_id, info in self.stages.items():
-            if info['type'] == "Decision":
-                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
-                # verifica saída yes
-                if stage_xml.find("proc:ontrue", ns) is None:
-                    self.boas_praticas = False
-                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Sim" definida. Revisar!')
-
-                # verifica saída no
-                if stage_xml.find("proc:onfalse", ns) is None:
-                    self.boas_praticas = False
-                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Não" definida. Revisar!')
+    
 
