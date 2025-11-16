@@ -64,6 +64,7 @@ if uploaded_file:
             objeto.validar_attach_ou_activate_das_pags()
             objeto.validar_uso_region()
             objeto.validar_decision_vazia()
+            objeto.validar_saida_decision()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:

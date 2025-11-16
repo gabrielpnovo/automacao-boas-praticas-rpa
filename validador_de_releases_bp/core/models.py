@@ -319,3 +319,19 @@ class BPObject(BPItem):
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
                     self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
 
+    def validar_saida_decision(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "Decision":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                # verifica saída yes
+                if stage_xml.find("proc:ontrue", ns) is None:
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Sim" definida. Revisar!')
+
+                # verifica saída no
+                if stage_xml.find("proc:onfalse", ns) is None:
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Não" definida. Revisar!')
+
