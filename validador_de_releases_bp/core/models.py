@@ -82,7 +82,7 @@ class BPItem(ABC):
                         "initialvalue": initial_value_tag.text if initial_value_tag is not None else None                        
                     }
 
-    def __get_subsheet_name_by_id(self, subsheetid: str) -> str:
+    def _get_subsheet_name_by_id(self, subsheetid: str) -> str:
         return self.subsheets[subsheetid]['name']
         
     def validar_excecoes_repetidas(self):
@@ -110,7 +110,7 @@ class BPItem(ABC):
                     # busca nomes das subsheets
                     nomes_paginas = []
                     for exc in exception_duplicada.values():
-                        exception_subsheet_name = self.__get_subsheet_name_by_id(exc.get('subsheetid'))
+                        exception_subsheet_name = self._get_subsheet_name_by_id(exc.get('subsheetid'))
                         nomes_paginas.append(exception_subsheet_name)
                     repetidas.append((exception.get('name'), nomes_paginas))
         
@@ -126,7 +126,7 @@ class BPItem(ABC):
         }
         for items in sem_datatype.values():
             self.boas_praticas = False
-            subsheet_name = self.__get_subsheet_name_by_id(items['subsheetid'])
+            subsheet_name = self._get_subsheet_name_by_id(items['subsheetid'])
             self.erros.append(f"❌ Data Item {items['name']} na página {subsheet_name} está sem um tipo atribuído. Revisar!")
 
     def validar_senhas_expostas(self):
@@ -140,7 +140,7 @@ class BPItem(ABC):
         }
         for items in data_items_expostos.values():
             self.boas_praticas = False
-            subsheet_name = self.__get_subsheet_name_by_id(items['subsheetid'])
+            subsheet_name = self._get_subsheet_name_by_id(items['subsheetid'])
             self.mas_praticas.append(f"⚠️ Validar se Data Item {items['name']} na página {subsheet_name} não deveria ser do tipo password")
 
     def validar_exception_type(self):
@@ -168,7 +168,7 @@ class BPItem(ABC):
         # registrar erros na lista de mas_praticas:
         for nome, tipo, subsheetid in exception_invalidas:
             self.boas_praticas = False
-            pagina = self.__get_subsheet_name_by_id(subsheetid)
+            pagina = self._get_subsheet_name_by_id(subsheetid)
             self.mas_praticas.append(
                 f"❌ Exception '{nome}' na página {pagina} possui tipo inválido: '{tipo}'. Ajustar para Business Exception ou System Exception."
             )
@@ -182,7 +182,7 @@ class BPItem(ABC):
         }
         for info in data_items_com_valor_inicial.values():
             self.boas_praticas = False
-            pagina = self.__get_subsheet_name_by_id(info["subsheetid"])
+            pagina = self._get_subsheet_name_by_id(info["subsheetid"])
             self.mas_praticas.append(
                 f"⚠️ Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
             )   
@@ -201,6 +201,7 @@ class BPObject(BPItem):
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
 
     def __post_init__(self):
+        super().__post_init__()
         self.__popular_elementos()
 
     def __popular_elementos(self):
@@ -308,4 +309,13 @@ class BPObject(BPItem):
                 self.boas_praticas = False
                 pagina = info['name']
                 self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
+
+    def validar_decision_vazia(self):
+        for stage_id, info in self.stages.items():
+            if info['type'] == "Decision":
+                stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
+                if stage_xml.find("proc:decision", ns).get('expression').strip() == "":
+                    self.boas_praticas = False
+                    pagina = self._get_subsheet_name_by_id(info['subsheetid'])
+                    self.mas_praticas.append(f'❌ Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
 

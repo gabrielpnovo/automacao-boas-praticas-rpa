@@ -63,13 +63,14 @@ if uploaded_file:
             objeto.validar_initial_value_dos_data_items()
             objeto.validar_attach_ou_activate_das_pags()
             objeto.validar_uso_region()
+            objeto.validar_decision_vazia()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
                     st.error(alerta)
 
-            if len(processo.erros)>0:
-                for erro in processo.erros:
+            if len(objeto.erros)>0:
+                for erro in objeto.erros:
                     st.error(alerta)
 
             if objeto.boas_praticas:
