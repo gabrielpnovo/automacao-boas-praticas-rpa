@@ -3,6 +3,7 @@ from core.xml_utils import limpa_arquivo, get_root_xml
 from core.blueprism_parser import extrai_processos_e_objetos
 from ui.layout import cabecalho, exibir_resultados
 from core.models import BPProcess, BPObject
+from core.gerar_relatorio_excel import gerar_relatorio_excel
 
 st.set_page_config(page_title="Validador Blue Prism", layout="wide")
 cabecalho()
@@ -15,6 +16,8 @@ if uploaded_file:
     xml_text = limpa_arquivo(raw)
     root_completa= get_root_xml(xml_text)
 
+    lista_itens = []
+
     # Fase 2 - Extração de processos e objetos ---
     processos: list[BPProcess]
     objetos:list[BPObject]
@@ -26,6 +29,7 @@ if uploaded_file:
     if processos:
         
         for processo in processos:
+            lista_itens.append(processo)
             print(f'--------------- INICIO PROCESSO {processo.name} ')
             st.markdown(f"<h4 style='color:teal;'>{processo.name}</h4>", unsafe_allow_html=True)
 
@@ -51,6 +55,7 @@ if uploaded_file:
     st.markdown("<h3 style='color:teal;'>===== Objetos =====</h3>", unsafe_allow_html=True)
     if objetos:
         for objeto in objetos:
+            lista_itens.append(objeto)
             print('============================================================ NOVA EXECUCAO ============================================================')
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
@@ -80,6 +85,18 @@ if uploaded_file:
 
             if objeto.boas_praticas:
                 st.success("✅ Objeto dentro das boas práticas")     
+
+    
+    st.markdown("<h2 style='color:teal;'>Relatório de Más Práticas e Erros - BluePrism</h2>", unsafe_allow_html=True)
+
+    excel_bytes = gerar_relatorio_excel(lista_itens)
+
+    st.download_button(
+        label="📥 Baixar relatório Excel",
+        data=excel_bytes,
+        file_name="relatorio_erros_masPraticas_blueprism.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
     # --- Exibição no Streamlit ---
     # exibir_resultados(processos, objetos)
