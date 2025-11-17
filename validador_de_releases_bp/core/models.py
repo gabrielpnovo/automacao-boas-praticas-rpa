@@ -229,10 +229,18 @@ class BPItem(ABC):
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
                     self.erros.append(f'❌ "Exception Detail" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
+
+    def validar_existencia_paginas(self):
+        for pagina_obrigatoria in self.paginas_obrigatorias:
+            if not any(info['name'] == pagina_obrigatoria for info in self.subsheets.values()):
+                self.boas_praticas = False
+                self.mas_praticas.append(f'❌ Página obrigatória "{pagina_obrigatoria}" não encontrada. Revisar!')
        
 
 @dataclass
 class BPProcess(BPItem):
+    paginas_obrigatorias: list[str] = field(default_factory=lambda: ['InicializationParameters', 'Anotações'], init=False)
+    
     # verificar se ta None
     def validar_publicacao(self):
         if self.root.get('published') is None:
@@ -242,6 +250,7 @@ class BPProcess(BPItem):
 @dataclass
 class BPObject(BPItem):
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
+    paginas_obrigatorias: list[str] = field(default_factory=lambda: ['Attach', 'Activate', 'Anotações', 'teste página'], init=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -357,7 +366,7 @@ class BPObject(BPItem):
         for stage_id, info in self.stages.items():
             if info['type'] == "WaitStart":
                 stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
-                
+
                 if not stage_xml.findall(".//proc:choice", ns):
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
