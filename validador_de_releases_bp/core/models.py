@@ -116,7 +116,7 @@ class BPItem(ABC):
         
         for excecao, paginas in repetidas:
             paginas_str = ", ".join(paginas)
-            self.mas_praticas.append(f"❌ Exceção '{excecao}' se repete nas seguintes páginas: {paginas_str}. Revisar!")
+            self.mas_praticas.append(f'Exceção "{excecao}" se repete nas seguintes páginas: "{paginas_str}". Revisar!')
         
     def validar_data_item_sem_type(self):
         sem_datatype = {
@@ -127,7 +127,7 @@ class BPItem(ABC):
         for items in sem_datatype.values():
             self.boas_praticas = False
             subsheet_name = self._get_subsheet_name_by_id(items['subsheetid'])
-            self.erros.append(f"❌ Data Item {items['name']} na página {subsheet_name} está sem um tipo atribuído. Revisar!")
+            self.erros.append(f'Data Item "{items['name']}" na página "{subsheet_name}" está sem um tipo atribuído. Revisar!')
 
     def validar_senhas_expostas(self):
         data_items_expostos = {
@@ -141,7 +141,7 @@ class BPItem(ABC):
         for items in data_items_expostos.values():
             self.boas_praticas = False
             subsheet_name = self._get_subsheet_name_by_id(items['subsheetid'])
-            self.mas_praticas.append(f"⚠️ Validar se Data Item {items['name']} na página {subsheet_name} não deveria ser do tipo password")
+            self.mas_praticas.append(f'Validar se Data Item "{items['name']}" na página "{subsheet_name}" não deveria ser do tipo password')
 
     def validar_exception_type(self):
         exception_invalidas = []
@@ -170,7 +170,7 @@ class BPItem(ABC):
             self.boas_praticas = False
             pagina = self._get_subsheet_name_by_id(subsheetid)
             self.mas_praticas.append(
-                f"❌ Exception '{nome}' na página {pagina} possui tipo inválido: '{tipo}'. Ajustar para Business Exception ou System Exception."
+                f'Exception "{nome}" na página {pagina} possui tipo inválido: "{tipo}". Ajustar para Business Exception ou System Exception.'
             )
     
     def validar_initial_value_dos_data_items(self):
@@ -184,7 +184,7 @@ class BPItem(ABC):
             self.boas_praticas = False
             pagina = self._get_subsheet_name_by_id(info["subsheetid"])
             self.mas_praticas.append(
-                f"⚠️ Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
+                f"Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
             )
 
     def validar_decision_vazia(self):
@@ -194,7 +194,7 @@ class BPItem(ABC):
                 if stage_xml.find("proc:decision", ns).get('expression').strip() == "":
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
+                    self.erros.append(f'Decision "{info["name"]}" na página "{pagina}" está sem expressão definida. Revisar!')
 
     def validar_saida_decision(self):
         for stage_id, info in self.stages.items():
@@ -204,13 +204,13 @@ class BPItem(ABC):
                 if stage_xml.find("proc:ontrue", ns) is None:
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Sim" definida. Revisar!')
+                    self.erros.append(f'Decision "{info["name"]}" na página "{pagina}" não possui saída "Sim" definida. Revisar!')
 
                 # verifica saída no
                 if stage_xml.find("proc:onfalse", ns) is None:
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ Decision "{info["name"]}" na página "{pagina}" não possui saída "Não" definida. Revisar!')
+                    self.erros.append(f'Decision "{info["name"]}" na página "{pagina}" não possui saída "Não" definida. Revisar!')
 
     def validar_exception_vazia(self):
         for stage_id, info in self.stages.items():
@@ -222,19 +222,19 @@ class BPItem(ABC):
                 if exception_tag.get('usecurrent') is None and exception_tag.get('type').strip() == '':
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ "Exception Type" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
+                    self.erros.append(f'"Exception Type" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
 
                 #verifica exception detail vazia
                 if exception_tag.get('usecurrent') is None and exception_tag.get('detail').strip() == '':
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ "Exception Detail" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
+                    self.erros.append(f'"Exception Detail" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
 
     def validar_existencia_paginas(self):
         for pagina_obrigatoria in self.paginas_obrigatorias:
             if not any(info['name'] == pagina_obrigatoria for info in self.subsheets.values()):
                 self.boas_praticas = False
-                self.mas_praticas.append(f'❌ Página obrigatória "{pagina_obrigatoria}" não encontrada. Revisar!')
+                self.mas_praticas.append(f'Página obrigatória "{pagina_obrigatoria}" não encontrada. Revisar!')
        
 
 @dataclass
@@ -245,7 +245,7 @@ class BPProcess(BPItem):
     def validar_publicacao(self):
         if self.root.get('published') is None:
             self.boas_praticas = False
-            self.mas_praticas.append("❌ Processo NÃO está publicado. Revisar!")
+            self.mas_praticas.append("Processo NÃO está publicado. Revisar!")
 
 @dataclass
 class BPObject(BPItem):
@@ -277,7 +277,6 @@ class BPObject(BPItem):
                         
                         
                         if attribute.get('inuse') is not None:
-                            # print(f'ATRIBUTO EM USO: {attribute.get("name")}')
                             
                             self.elements[id]["atributes"].append({
                                 "name": attribute.get("name"),
@@ -285,7 +284,7 @@ class BPObject(BPItem):
                                 "value": valor_atributo
                             })
                         else:
-                            # print(f'ATRIBUTO NÃO EM USO: {attribute.get("name")}')
+
                             self.elements[id]["atributes"].append({
                                 "name": attribute.get("name"),
                                 "inuse": False,
@@ -296,30 +295,27 @@ class BPObject(BPItem):
         for valor in self.elements.values():
             for atributo in valor['atributes']:
                 if atributo['inuse'] and (atributo['value'] is None or atributo['value'].strip() == ""):
-                    # print(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio.')
                     self.boas_praticas = False
-                    self.mas_praticas.append(f'❌ Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio. Revisar!')
+                    self.mas_praticas.append(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio. Revisar!')
 
     def validar_match_index(self):
         for valor in self.elements.values():
             for atributo in valor['atributes']:
                 if atributo['name'].lower() == 'matchindex' and atributo['inuse'] == False:
-                    print(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está em uso, mas vazio.')
                     self.boas_praticas = False
-                    self.mas_praticas.append(f'⚠️ Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está DESATIVADO. Revisar!')
+                    self.mas_praticas.append(f'Atributo "{atributo["name"]}" do elemento "{valor["name"]}" está DESATIVADO. Revisar!')
     
     def validar_uso_region(self):
         for tag in ["region", "region-container"]:
             for region in self.root.findall(f".//proc:{tag}", ns):
                 self.boas_praticas = False
-                self.mas_praticas.append(f"❌ O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")
+                self.mas_praticas.append(f"O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")
             
     def validar_publicacao_paginas(self):
         for valor in self.subsheets.values():
             if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate', 'Detach','Clean Up', 'Anotações']:
-                print(f'Página não está publicada: {valor['name']}')
                 self.boas_praticas = False
-                self.mas_praticas.append(f'❌ Página "{valor['name']}" NÃO está publicada. Revisar!')
+                self.mas_praticas.append(f'Página "{valor['name']}" NÃO está publicada. Revisar!')
 
     def validar_attach_ou_activate_das_pags(self):
         subsheets_attach_activate = {
@@ -352,16 +348,13 @@ class BPObject(BPItem):
             if prox_stage is None:
                 self.boas_praticas = False
                 pagina = info['name']
-                print(
-                    f"❌ A página '{pagina}' possui um Start cujo On Success não aponta para um stage válido."
-                )
                 continue
             
             # verifica se o stage é um SubSheet e o processid é um attach/activate
             if prox_stage.get('type') != 'SubSheet' and prox_stage.get('processid') not in attach_activate_ids:
                 self.boas_praticas = False
                 pagina = info['name']
-                self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
+                self.mas_praticas.append(f"A página '{pagina}' não inicia com Attach/Activate")
 
     def validar_wait_stage_sem_elemento(self):
         for stage_id, info in self.stages.items():
@@ -371,14 +364,14 @@ class BPObject(BPItem):
                 if not stage_xml.findall(".//proc:choice", ns):
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'❌ Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
+                    self.erros.append(f'Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
 
     def validar_nome_elemento(self):
         for valor in self.elements.values():
             # if not any(elemento in valor['name'] for elemento in self.nomes_elementos):
             if not any(valor['name'].lower().startswith(elemento.lower()) for elemento in self.nomes_elementos):
                 self.boas_praticas = False
-                self.mas_praticas.append(f'⚠️ O elemento "{valor["name"]}" possui um nome não convencional. Revisar!')
+                self.mas_praticas.append(f'O elemento "{valor["name"]}" possui um nome não convencional. Revisar!')
 
 
     

@@ -37,11 +37,11 @@ if uploaded_file:
 
             if len(processo.mas_praticas)>0:
                 for alerta in processo.mas_praticas:
-                    st.error(alerta)
+                    st.warning(f'⚠️ {alerta}')
 
             if len(processo.erros)>0:
                 for erro in processo.erros:
-                    st.error(alerta)
+                    st.error(f'❌ {erro}')
 
             if processo.boas_praticas:
                 st.success("✅ Processo dentro das boas práticas")
@@ -72,11 +72,11 @@ if uploaded_file:
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
-                    st.error(alerta)
+                    st.warning(f'⚠️ {alerta}')
 
             if len(objeto.erros)>0:
                 for erro in objeto.erros:
-                    st.error(erro)
+                    st.error(f'❌ {erro}')
 
             if objeto.boas_praticas:
                 st.success("✅ Objeto dentro das boas práticas")     
