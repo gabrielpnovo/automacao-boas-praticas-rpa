@@ -257,8 +257,8 @@ class BPObject(BPItem):
     #           ]
         # }
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
-    paginas_obrigatorias: list[str] = field(default_factory=lambda: ['Attach', 'Activate', 'Anotações', 'teste página'], init=False)
-    nomes_elementos: list[str] = field(default_factory=lambda: ['label', 'button', 'window', 'internal frame', 'field'], init=False)
+    paginas_obrigatorias: list[str] = field(default_factory=lambda: ['Attach', 'Activate', 'Anotações'], init=False)
+    nomes_elementos: list[str] = field(default_factory=lambda: ['label', 'button', 'window', 'internal frame', 'field', 'combobox', 'radio button'], init=False)
 
     def __post_init__(self):
         super().__post_init__()
