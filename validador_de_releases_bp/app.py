@@ -66,8 +66,9 @@ if uploaded_file:
             # objeto.validar_decision_vazia()
             # objeto.validar_saida_decision()
             # objeto.validar_exception_vazia()
-            # objeto.wait_stage_sem_elemento()
-            objeto.validar_existencia_paginas()
+            # objeto.validar_wait_stage_sem_elemento()
+            # objeto.validar_existencia_paginas()
+            objeto.validar_nome_elemento()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:

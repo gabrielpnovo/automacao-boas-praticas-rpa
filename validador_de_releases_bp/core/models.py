@@ -251,6 +251,7 @@ class BPProcess(BPItem):
 class BPObject(BPItem):
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
     paginas_obrigatorias: list[str] = field(default_factory=lambda: ['Attach', 'Activate', 'Anotações', 'teste página'], init=False)
+    nomes_elementos: list[str] = field(default_factory=lambda: ['label', 'button', 'window', 'internal frame', 'field'], init=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -362,7 +363,7 @@ class BPObject(BPItem):
                 pagina = info['name']
                 self.mas_praticas.append(f"⚠️ A página '{pagina}' não inicia com Attach/Activate")
 
-    def wait_stage_sem_elemento(self):
+    def validar_wait_stage_sem_elemento(self):
         for stage_id, info in self.stages.items():
             if info['type'] == "WaitStart":
                 stage_xml = self.root.find(f".//proc:stage[@stageid='{stage_id}']", ns)
@@ -371,6 +372,13 @@ class BPObject(BPItem):
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
                     self.erros.append(f'❌ Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
+
+    def validar_nome_elemento(self):
+        for valor in self.elements.values():
+            # if not any(elemento in valor['name'] for elemento in self.nomes_elementos):
+            if not any(valor['name'].lower().startswith(elemento.lower()) for elemento in self.nomes_elementos):
+                self.boas_praticas = False
+                self.mas_praticas.append(f'⚠️ O elemento "{valor["name"]}" possui um nome não convencional. Revisar!')
 
 
     
