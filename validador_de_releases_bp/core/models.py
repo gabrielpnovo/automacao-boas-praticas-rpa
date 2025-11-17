@@ -249,6 +249,13 @@ class BPProcess(BPItem):
 
 @dataclass
 class BPObject(BPItem):
+    # estrutura de elements = elementid: {
+    #       nome_elemento:str, 
+    #           atributos: [
+    #               {name:str, inuse:bool, value:str},
+    #               ...
+    #           ]
+        # }
     elements: dict[str, dict[str, str | list[dict[str, str]]]] = field(default_factory=dict, init=False)
     paginas_obrigatorias: list[str] = field(default_factory=lambda: ['Attach', 'Activate', 'Anotações', 'teste página'], init=False)
     nomes_elementos: list[str] = field(default_factory=lambda: ['label', 'button', 'window', 'internal frame', 'field'], init=False)
