@@ -127,7 +127,7 @@ class BPObject(BPItem):
                 if not stage_xml.findall(".//proc:choice", ns):
                     self.boas_praticas = False
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
-                    self.erros.append(f'Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
+                    self.mas_praticas.append(f'Wait Stage "{info["name"]}" na página "{pagina}" não possui nenhum elemento definido para espera. Revisar!')
 
     def validar_nome_elemento(self):
         for valor in self.elements.values():
