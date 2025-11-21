@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from ..constants import NAMESPACES as ns
+from core.constants import NAMESPACES as ns
 from abc import ABC
 import xml.etree.ElementTree as ET
 

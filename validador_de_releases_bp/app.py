@@ -2,7 +2,8 @@ import streamlit as st
 from core.xml_utils import limpa_arquivo, get_root_xml
 from core.blueprism_parser import extrai_processos_e_objetos
 from ui.layout import cabecalho, exibir_resultados
-from core.Models.models import BPProcess, BPObject
+from core.Models.BPProcess import BPProcess
+from core.Models.BPObject import BPObject
 from core.gerar_relatorio_excel import gerar_relatorio_excel
 
 st.set_page_config(page_title="Validador Blue Prism", layout="wide")

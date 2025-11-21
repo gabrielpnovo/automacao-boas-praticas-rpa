@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from ..constants import NAMESPACES as ns
-from Models import BPItem
+from core.constants import NAMESPACES as ns
+from .BPItem import BPItem
 import xml.etree.ElementTree as ET
 
 @dataclass
