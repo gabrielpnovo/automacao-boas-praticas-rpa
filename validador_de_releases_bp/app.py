@@ -61,7 +61,7 @@ if uploaded_file:
             print(f'--------------- INICIO OBJETO {objeto.name} ')
             st.markdown(f"<h4 style='color:teal;'>{objeto.name}</h4>", unsafe_allow_html=True)
                         
-            objeto.validar_publicacao_paginas()
+            objeto.validar_publicacao_acao()
             objeto.validar_excecoes_repetidas()
             objeto.validar_data_item_sem_type()
             objeto.validar_senhas_expostas()

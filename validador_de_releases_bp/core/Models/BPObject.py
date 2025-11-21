@@ -74,11 +74,11 @@ class BPObject(BPItem):
                 self.boas_praticas = False
                 self.mas_praticas.append(f"O elemento '{region.get("name")}' está mapeado em Region, o que é fortemente desaconselhado. Revisar!")
             
-    def validar_publicacao_paginas(self):
+    def validar_publicacao_acao(self):
         for valor in self.subsheets.values():
             if not valor['published'] and valor['name'] not in ['Attach', 'Anotações', 'Activate', 'Detach','Clean Up', 'Anotações']:
                 self.boas_praticas = False
-                self.mas_praticas.append(f'Página "{valor['name']}" NÃO está publicada. Revisar!')
+                self.mas_praticas.append(f'Ação "{valor['name']}" NÃO está publicada. Revisar!')
 
     def validar_attach_ou_activate_das_pags(self):
         subsheets_attach_activate = {
