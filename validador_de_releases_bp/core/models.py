@@ -17,6 +17,7 @@ class BPItem(ABC):
     # estrutura de stages = stageid: {name:str, type:str, subsheetid:str}
     stages: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
     data_items: dict[str, dict[str, str]] = field(default_factory=dict, init=False)
+    paginas_obrigatorias: list[str] = field(default_factory=list)
     mas_praticas: list[str] = field(default_factory=list, init=False)
     erros: list[str] = field(default_factory=list, init=False)
 
