@@ -162,6 +162,7 @@ class BPItem(ABC):
                 tipos_validos = {"Business Exception", "System Exception"}
 
                 if tipo_exception != "" and tipo_exception not in tipos_validos and exception_tag.get('usecurrent') is None:
+                    self.boas_praticas = False            
                     exception_invalidas.append((info["name"], tipo_exception, info["subsheetid"]))
 
         # registrar erros na lista de mas_praticas:
