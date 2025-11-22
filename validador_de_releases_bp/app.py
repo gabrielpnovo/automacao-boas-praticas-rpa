@@ -67,7 +67,7 @@ if uploaded_file:
             objeto.validar_senhas_expostas()
             objeto.validar_exception_type()
             objeto.validar_initial_value_dos_data_items()
-            objeto.validar_attach_ou_activate_das_pags()
+            objeto.validar_attach_ou_activate_das_acoes()
             objeto.validar_uso_region()
             objeto.validar_decision_vazia()
             objeto.validar_saida_decision()

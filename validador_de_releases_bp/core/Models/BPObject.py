@@ -80,7 +80,7 @@ class BPObject(BPItem):
                 self.boas_praticas = False
                 self.mas_praticas.append(f'Ação "{valor['name']}" NÃO está publicada. Revisar!')
 
-    def validar_attach_ou_activate_das_pags(self):
+    def validar_attach_ou_activate_das_acoes(self):
         subsheets_attach_activate = {
             subsheet_id: info
             for subsheet_id, info in self.subsheets.items()
@@ -135,3 +135,17 @@ class BPObject(BPItem):
             if not any(valor['name'].lower().startswith(elemento.lower()) for elemento in self.nomes_elementos):
                 self.boas_praticas = False
                 self.mas_praticas.append(f'O elemento "{valor["name"]}" possui um nome não convencional. Revisar!')
+
+    def validar_initial_value_dos_data_items(self):
+        # obs: só filtro por subsheet_id not None porque a página Initialise não tem subsheet_id e também porque as variáveis nela terão necessariamente que ter initial value, então não precisam ser considerados
+        data_items_com_valor_inicial = {
+            stage_id: info
+            for stage_id, info in self.data_items.items()
+            if info.get("initialvalue") not in (None, "") and info.get("subsheet_id") is not None
+        }
+        for info in data_items_com_valor_inicial.values():
+            self.boas_praticas = False
+            pagina = self._get_subsheet_name_by_id(info["subsheetid"])
+            self.mas_praticas.append(
+                f"Data Item '{info['name']}' na página '{pagina}' possui valor inicial. Validar se isso é realmente necessário."
+            )
