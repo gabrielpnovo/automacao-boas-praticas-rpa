@@ -111,11 +111,13 @@ class BPItem(ABC):
                     for exc in exception_duplicada.values():
                         exception_subsheet_name = self._get_subsheet_name_by_id(exc.get('subsheetid'))
                         nomes_paginas.append(exception_subsheet_name)
+
+                    nomes_paginas = list(set(nomes_paginas))
                     repetidas.append((exception.get('name'), nomes_paginas))
         
         for excecao, paginas in repetidas:
             paginas_str = ", ".join(paginas)
-            self.mas_praticas.append(f'Exceção "{excecao}" se repete nas seguintes páginas: "{paginas_str}". Revisar!')
+            self.mas_praticas.append(f'Exceção "{excecao}" se repete na(s) seguinte(s) página(s): "{paginas_str}". Revisar!')
         
     def validar_data_item_sem_type(self):
         sem_datatype = {
