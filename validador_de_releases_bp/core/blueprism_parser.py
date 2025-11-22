@@ -1,6 +1,6 @@
 from .xml_utils import get_root_xml
 from core.constants import NAMESPACES as ns
-from core.Models import BPProcess, BPObject
+from core.models import BPProcess, BPObject
 import xml.etree.ElementTree as ET
 from typing import List, Tuple
 
