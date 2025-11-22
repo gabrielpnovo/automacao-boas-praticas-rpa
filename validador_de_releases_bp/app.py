@@ -75,6 +75,8 @@ if uploaded_file:
             objeto.validar_wait_stage_sem_elemento()
             objeto.validar_existencia_paginas_padrao()
             objeto.validar_nome_elemento()
+            objeto.validar_match_index()
+            objeto.validar_atributo_vazio()
 
             if len(objeto.mas_praticas)>0:
                 for alerta in objeto.mas_praticas:
