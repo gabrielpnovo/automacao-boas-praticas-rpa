@@ -123,7 +123,7 @@ class BPItem(ABC):
         sem_datatype = {
             stage_id: info
             for stage_id, info in self.data_items.items()
-            if info.get("datatype") is None
+            if info.get("datatype") is None or info.get("datatype") == "unknown"
         }
         for items in sem_datatype.values():
             self.boas_praticas = False
