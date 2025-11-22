@@ -1,13 +1,16 @@
 import streamlit as st
 from core.xml_utils import limpa_arquivo, get_root_xml
 from core.blueprism_parser import extrai_processos_e_objetos
-from ui.layout import cabecalho, exibir_resultados
 from core.models import BPProcess, BPObject
 
 from core.gerar_relatorio_excel import gerar_relatorio_excel
 
 st.set_page_config(page_title="Validador Blue Prism", layout="wide")
-cabecalho()
+st.markdown("<h1 style='color:teal;'>🔎 Ferramenta de Validação de Releases Blue Prism</h1>", unsafe_allow_html=True)
+# st.title("🔎 Ferramenta de Validação de Releases Blue Prism")
+st.markdown("<h3 style='color:teal;'>Analisa arquivos "".bprelease"" e identifica inconsistências em processos e objetos.</h3>", unsafe_allow_html=True)
+# st.caption("Analisa arquivos `.bprelease` e identifica inconsistências em processos e objetos.")
+st.divider()
 
 uploaded_file = st.file_uploader("Envie seu arquivo .bprelease", type=["bprelease"])
 
