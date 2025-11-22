@@ -216,7 +216,7 @@ class BPItem(ABC):
                     pagina = self._get_subsheet_name_by_id(info['subsheetid'])
                     self.erros.append(f'"Exception Detail" da exceção "{info["name"]}" na página "{pagina}" não está definida. Revisar!')
 
-    def validar_existencia_paginas(self):
+    def validar_existencia_paginas_padrao(self):
         for pagina_obrigatoria in self.paginas_obrigatorias:
             if not any(info['name'] == pagina_obrigatoria for info in self.subsheets.values()):
                 self.boas_praticas = False

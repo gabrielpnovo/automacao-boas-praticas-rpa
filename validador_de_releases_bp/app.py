@@ -73,7 +73,7 @@ if uploaded_file:
             objeto.validar_saida_decision()
             objeto.validar_exception_vazia()
             objeto.validar_wait_stage_sem_elemento()
-            objeto.validar_existencia_paginas()
+            objeto.validar_existencia_paginas_padrao()
             objeto.validar_nome_elemento()
 
             if len(objeto.mas_praticas)>0:
